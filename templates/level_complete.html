@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level {{ level }} Complete!</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="ocean-bg"></div>
+  <div class="stars"></div>
+  <canvas id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:5;"></canvas>
+
+  <div class="page-wrap">
+    <div class="card" style="max-width:520px;">
+
+      <div style="font-size:3.2rem; margin-bottom:8px; animation:float 2s ease-in-out infinite;">💰</div>
+      <h1 class="title-main">Yo Ho Captain!</h1>
+      <p class="title-sub">Level {{ level }} Complete!</p>
+
+      <div class="divider"></div>
+
+      <!-- Stats -->
+      <p style="font-family:'Fredoka One',cursive; color:var(--wave2); font-size:0.95rem;
+                letter-spacing:1px; margin-bottom:10px;">⚓ Your Performance</p>
+
+      <table class="stats-table">
+        <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>⏱️ Time Taken</td>      <td>{{ stats.get('time','—') }}s</td></tr>
+          <tr><td>💥 Wall Crashes</td>    <td>{{ stats.get('mistakes','—') }}</td></tr>
+          <tr><td>🧭 Total Moves</td>     <td>{{ stats.get('moves','—') }}</td></tr>
+          <tr><td>📍 Optimal Moves</td>   <td>{{ stats.get('optimal_moves','—') }}</td></tr>
+          <tr><td>⭐ Path Efficiency</td>
+              <td>{% if stats.get('efficiency') %}{{ "%.0f"|format(stats['efficiency']*100) }}%{% else %}—{% endif %}</td>
+          </tr>
+          <tr><td>❤️ Lives Left</td>      <td>{{ stats.get('lives_left','—') }}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="divider"></div>
+
+      {% if next_level <= 3 %}
+      <div style="background:var(--card-tint); border:1.5px solid var(--input-border);
+                  border-radius:12px; padding:14px 18px; margin-bottom:18px; text-align:left;">
+        <p style="font-family:'Fredoka One',cursive; color:var(--wave2); margin-bottom:6px; font-size:0.95rem;">
+          🧠 AI Adapting Level {{ next_level }}…
+        </p>
+        <p style="font-size:0.86rem; color:rgba(0,0,0,0.55); line-height:1.6; font-family:'Nunito',sans-serif;">
+          The Deep Learning model analysed your performance and is generating Level {{ next_level }} tailored to your skill.
+          Expect a
+          {% if stats.get('efficiency',0) > 0.7 %}
+            <strong style="color:var(--danger);">harder</strong> challenge!
+          {% elif stats.get('efficiency',0) > 0.4 %}
+            <strong style="color:var(--wave1);">moderate</strong> challenge.
+          {% else %}
+            <strong style="color:var(--success);">gentler</strong> maze.
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
+
+      <div class="btn-row">
+        {% if next_level <= 3 %}
+          <a href="/game" class="btn btn-primary" onclick="speakSail()">
+            ⚓ Go on Another Hunt! (Level {{ next_level }})
+          </a>
+        {% else %}
+          <a href="/win" class="btn btn-primary">👑 Claim Your Glory!</a>
+        {% endif %}
+        <a href="/" class="btn btn-ghost" onclick="speakTired()">😴 I am tired…</a>
+      </div>
+
+      <div class="divider"></div>
+      <a href="/history" class="btn btn-ghost" style="font-size:0.88rem; padding:7px 18px;">📜 Pirate History</a>
+
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div style="position:fixed;bottom:0;left:0;width:100%;z-index:5;pointer-events:none;overflow:hidden;height:140px;">
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:140px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 140" preserveAspectRatio="none">
+      <path fill="#4A90D9" d="M0,80 C200,110 400,50 600,80 C800,110 1000,50 1200,80 C1320,95 1400,70 1440,80 L1440,140 L0,140 Z"/>
+    </svg>
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:100px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <path fill="#2874A6" d="M0,60 C180,30 360,80 540,60 C720,40 900,80 1080,60 C1260,40 1380,65 1440,60 L1440,100 L0,100 Z"/>
+    </svg>
+  </div>
+
+  <script>
+    function say(t) {
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(t);
+      u.rate=0.85; u.pitch=0.8; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
+    function speakSail()  { say('Yo Ho Captain! Onwards to the next hunt!'); }
+    function speakTired() { say('Rest well, brave Captain.'); }
+    window.addEventListener('load', () => say('Yo Ho Captain! You did it!'));
+
+    // Confetti
+    const c = document.getElementById('confetti');
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    const fc = c.getContext('2d');
+    const ps = Array.from({length:70}, () => ({
+      x: Math.random()*c.width, y: Math.random()*c.height*0.5,
+      vx:(Math.random()-0.5)*4, vy:(Math.random()-0.5)*3-1.5,
+      size:Math.random()*6+2,
+      color:['#4A90D9','#2874A6','#87CEEB','#ffd700','#fff','#f44336'][Math.floor(Math.random()*6)],
+      life:1, decay:Math.random()*0.012+0.005
+    }));
+    (function tick() {
+      fc.clearRect(0,0,c.width,c.height);
+      ps.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.07; p.life-=p.decay;
+        if(p.life<=0) return;
+        fc.globalAlpha=p.life; fc.fillStyle=p.color;
+        fc.beginPath(); fc.arc(p.x,p.y,p.size,0,Math.PI*2); fc.fill();
+      });
+      fc.globalAlpha=1;
+      if(ps.some(p=>p.life>0)) requestAnimationFrame(tick); else c.remove();
+    })();
+  </script>
+</body>
+</html>

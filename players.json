@@ -1,0 +1,247 @@
+[
+  {
+    "name": "pihu",
+    "birthday": "2005-03-13",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 40,
+        "optimal_moves": 40,
+        "time": 22.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 2,
+        "mistakes": 1,
+        "moves": 72,
+        "optimal_moves": 72,
+        "time": 26.0
+      },
+      {
+        "level": 3,
+        "time": 72.0,
+        "mistakes": 2,
+        "moves": 172,
+        "optimal_moves": 172,
+        "efficiency": 1.0,
+        "lives_left": 1
+      }
+    ],
+    "date": "2026-03-28"
+  },
+  {
+    "name": "pihu",
+    "birthday": "2005-01-31",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 40,
+        "optimal_moves": 40,
+        "time": 28.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 1,
+        "mistakes": 2,
+        "moves": 72,
+        "optimal_moves": 72,
+        "time": 24.0
+      },
+      {
+        "level": 3,
+        "time": 68.0,
+        "mistakes": 2,
+        "moves": 172,
+        "optimal_moves": 172,
+        "efficiency": 1.0,
+        "lives_left": 1
+      }
+    ],
+    "date": "2026-03-30"
+  },
+  {
+    "name": "aloo bukhara",
+    "birthday": "2005-05-11",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 0.526,
+        "level": 1,
+        "lives_left": 1,
+        "mistakes": 2,
+        "moves": 76,
+        "optimal_moves": 40,
+        "time": 35.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 2,
+        "mistakes": 1,
+        "moves": 72,
+        "optimal_moves": 72,
+        "time": 26.0
+      },
+      {
+        "level": 3,
+        "time": 55.0,
+        "mistakes": 0,
+        "moves": 180,
+        "optimal_moves": 172,
+        "efficiency": 0.956,
+        "lives_left": 3
+      }
+    ],
+    "date": "2026-03-30"
+  },
+  {
+    "name": "Home",
+    "birthday": "2004-02-05",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 72,
+        "optimal_moves": 72,
+        "time": 40.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 84,
+        "optimal_moves": 84,
+        "time": 47.0
+      },
+      {
+        "level": 3,
+        "time": 246.0,
+        "mistakes": 1,
+        "moves": 218,
+        "optimal_moves": 208,
+        "efficiency": 0.954,
+        "lives_left": 2
+      }
+    ],
+    "date": "2026-04-01"
+  },
+  {
+    "name": "prem",
+    "birthday": "2005-10-28",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 1,
+        "mistakes": 2,
+        "moves": 48,
+        "optimal_moves": 48,
+        "time": 26.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 100,
+        "optimal_moves": 100,
+        "time": 36.0
+      },
+      {
+        "level": 3,
+        "time": 75.0,
+        "mistakes": 2,
+        "moves": 140,
+        "optimal_moves": 140,
+        "efficiency": 1.0,
+        "lives_left": 1
+      }
+    ],
+    "date": "2026-04-01"
+  },
+  {
+    "name": "om",
+    "birthday": "2005-09-16",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 2,
+        "mistakes": 1,
+        "moves": 40,
+        "optimal_moves": 40,
+        "time": 21.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 116,
+        "optimal_moves": 116,
+        "time": 50.0
+      },
+      {
+        "level": 3,
+        "time": 111.0,
+        "mistakes": 2,
+        "moves": 208,
+        "optimal_moves": 208,
+        "efficiency": 1.0,
+        "lives_left": 1
+      }
+    ],
+    "date": "2026-04-02"
+  },
+  {
+    "name": "purva",
+    "birthday": "2005-09-09",
+    "completed": true,
+    "stats": [
+      {
+        "efficiency": 1.0,
+        "level": 1,
+        "lives_left": 1,
+        "mistakes": 2,
+        "moves": 76,
+        "optimal_moves": 76,
+        "time": 26.0
+      },
+      {
+        "efficiency": 1.0,
+        "level": 2,
+        "lives_left": 3,
+        "mistakes": 0,
+        "moves": 48,
+        "optimal_moves": 48,
+        "time": 17.0
+      },
+      {
+        "level": 3,
+        "time": 52.0,
+        "mistakes": 2,
+        "moves": 164,
+        "optimal_moves": 164,
+        "efficiency": 1.0,
+        "lives_left": 1
+      }
+    ],
+    "date": "2026-04-08"
+  }
+]

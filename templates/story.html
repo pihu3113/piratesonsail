@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Story — Pirate on Sail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="ocean-bg"></div>
+  <div class="stars"></div>
+
+  <div class="page-wrap">
+    <div class="card" style="max-width:600px;">
+
+      <!-- Step 1: Story intro -->
+      <div id="step-story">
+        <div style="font-size:2.8rem; margin-bottom:10px; animation:float 3s ease-in-out infinite;">🌊</div>
+        <h1 class="title-main">A Pirate's Tale</h1>
+        <p class="title-sub">Ahoy, Captain <strong>{{ name }}</strong>!</p>
+        <div class="divider"></div>
+        <div class="story-text">
+          <em>
+            "Once upon a time, in the deep ocean,<br>
+            a hidden treasure chest guarded by a giant octopus awaits…<br><br>
+            Many brave pirates have tried to claim the gold —<br>
+            none have returned. Will you dare?"
+          </em>
+        </div>
+        <div style="font-size:2.2rem; margin:18px 0;">🐙 💰 🚢</div>
+        <p style="font-family:'Indie Flower',cursive; font-size:1.05rem; color:var(--text-dark); margin-bottom:22px;">
+          Do you want the treasure, Captain?
+        </p>
+        <button class="btn btn-primary choice-btn" onclick="showReady()">✅ Yes, I want the treasure!</button>
+        <button class="btn btn-danger choice-btn" onclick="showScared()">❌ No, I am scared…</button>
+      </div>
+
+      <!-- Step 2: Ready? -->
+      <div id="step-ready" style="display:none;">
+        <div style="font-size:2.8rem; margin-bottom:10px; animation:float 3s ease-in-out infinite;">⚓</div>
+        <h2 class="title-main">Ready, Captain?</h2>
+        <div class="divider"></div>
+        <div class="story-text">
+          <em>
+            "The ocean breeze fills your sails…<br>
+            Three levels of danger lie ahead.<br>
+            The AI charts the waters based on your skill.<br>
+            Navigate the maze, avoid the walls, find the gold!"
+          </em>
+        </div>
+        <div style="background:var(--card-tint); border-radius:12px; padding:14px 18px;
+                    margin:16px 0; font-size:0.95rem; color:var(--text-dark); text-align:left;
+                    border:1.5px solid var(--input-border);">
+          <strong style="color:var(--wave2);">Controls:</strong> Arrow keys to move your ship<br>
+          <strong style="color:var(--wave2);">Lives:</strong> 3 hearts — crashing into walls costs a life!<br>
+          <strong style="color:var(--danger);">Goal:</strong> Reach the 💰 green block
+        </div>
+        <a href="/game" class="btn btn-primary choice-btn" onclick="speakSail()">⚓ Let's Sail!</a>
+        <button class="btn btn-ghost choice-btn" onclick="showStory()">😨 I am scared…</button>
+      </div>
+
+      <!-- Step 3: Scared -->
+      <div id="step-scared" style="display:none;">
+        <div style="font-size:2.8rem; margin-bottom:10px;">😄</div>
+        <h2 class="title-main">Every Captain Fears!</h2>
+        <div class="divider"></div>
+        <div class="story-text">
+          <em>
+            "Ha! Even the greatest pirates knew fear.<br>
+            But they sailed anyway — and that made them legends!<br><br>
+            The treasure awaits, Captain. Courage is not the absence of fear…
+            it is sailing despite it!"
+          </em>
+        </div>
+        <button class="btn btn-primary choice-btn" onclick="showStory()">🔄 Take me back!</button>
+        <a href="/" class="btn btn-ghost choice-btn">🏠 Return to Port</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div class="waves-wrap" style="position:fixed;bottom:0;left:0;width:100%;z-index:5;pointer-events:none;overflow:hidden;height:180px;">
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:180px;animation:waveSlide 11s ease-in-out infinite alternate-reverse;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 180" preserveAspectRatio="none">
+      <path fill="#2874A6" d="M0,100 C180,140 360,60 540,100 C720,140 900,60 1080,100 C1260,140 1380,80 1440,100 L1440,180 L0,180 Z"/>
+    </svg>
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:180px;animation:waveSlide 8s ease-in-out infinite alternate;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 180" preserveAspectRatio="none">
+      <path fill="#4A90D9" d="M0,120 C200,80 400,150 600,120 C800,90 1000,155 1200,120 C1320,100 1400,130 1440,120 L1440,180 L0,180 Z"/>
+    </svg>
+  </div>
+  <style>
+    @keyframes waveSlide { 0%{transform:translateX(0)} 100%{transform:translateX(4%)} }
+    .waves-wrap { position:fixed;bottom:0;left:0;width:100%;z-index:5;pointer-events:none;overflow:hidden;height:180px; }
+  </style>
+
+  <script>
+    const steps = ['step-story','step-ready','step-scared'];
+    function show(id) { steps.forEach(s=>document.getElementById(s).style.display='none'); document.getElementById(id).style.display='block'; }
+    function showStory()  { show('step-story');  say('Once upon a time in the deep ocean, a hidden treasure chest guarded by a giant octopus awaits.'); }
+    function showReady()  { show('step-ready');  say('Are you ready Captain? The ocean awaits!'); }
+    function showScared() { show('step-scared'); say('Even the greatest pirates knew fear! But they sailed anyway!'); }
+    function speakSail()  { say('Yo Ho Captain! Let us sail!'); }
+    function say(t) {
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(t);
+      u.rate=0.85; u.pitch=0.8; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
+    window.addEventListener('load', showStory);
+  </script>
+</body>
+</html>

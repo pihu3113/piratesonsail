@@ -1,0 +1,472 @@
+/* ── Google Fonts ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Indie+Flower&family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap');
+
+/* ── Reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Figma Color Variables ────────────────────────────────────────────── */
+:root {
+  --sky:          #87CEEB;   /* main page background */
+  --sky-light:    #B8E4F9;   /* lighter sky */
+  --sky-dark:     #6BB8D4;   /* slightly deeper */
+  --wave1:        #4A90D9;   /* first wave layer  */
+  --wave2:        #2874A6;   /* second wave layer */
+  --card-bg:      #FFFFFF;   /* white blob/card   */
+  --card-tint:    #EAF6FD;   /* very light blue tint for inputs */
+  --title-color:  #1a1a1a;   /* near black title  */
+  --text-dark:    #1a1a1a;
+  --text-mid:     #2874A6;   /* teal text (subtitle) */
+  --btn-bg:       #2E6B8A;   /* dark teal button  */
+  --btn-hover:    #1a5270;
+  --input-border: #90CAE8;
+  --danger:       #c0392b;
+  --success:      #16a34a;
+  --gold:         #d4a017;   /* kept for small accents */
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+html, body {
+  width: 100%; min-height: 100vh;
+  background: var(--sky);
+  color: var(--text-dark);
+  font-family: 'Nunito', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── Animated wave background ─────────────────────────────────────────── */
+.ocean-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: linear-gradient(180deg, var(--sky-light) 0%, var(--sky) 60%, var(--sky-dark) 100%);
+  overflow: hidden;
+}
+
+/* Bottom wave decoration (two layers) */
+.ocean-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; left: -5%;
+  width: 110%; height: 220px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220'%3E%3Cpath fill='%234A90D9' d='M0,96L60,106.7C120,117,240,139,360,138.7C480,139,600,117,720,101.3C840,85,960,75,1080,85.3C1200,96,1320,128,1380,144L1440,160L1440,220L0,220Z'/%3E%3C/svg%3E")
+    center bottom / cover no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220'%3E%3Cpath fill='%232874A6' d='M0,160L60,149.3C120,139,240,117,360,117.3C480,117,600,139,720,149.3C840,160,960,160,1080,149.3C1200,139,1320,117,1380,112L1440,107L1440,220L0,220Z'/%3E%3C/svg%3E")
+    center bottom / cover no-repeat;
+  animation: wavePush 7s ease-in-out infinite alternate;
+}
+
+@keyframes wavePush {
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(3%);   }
+}
+
+/* Small stars/bubbles for decoration */
+.stars {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 40% 15%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 65% 10%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 85% 30%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 25% 45%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 75% 20%, rgba(255,255,255,0.5), transparent);
+}
+
+/* ── Page wrapper ─────────────────────────────────────────────────────── */
+.page-wrap {
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px 16px 120px;  /* bottom padding clears waves */
+}
+
+/* ── Main blob card (matches Figma white blob) ────────────────────────── */
+.card {
+  background: var(--card-bg);
+  border-radius: 55px 45px 60px 50px / 45px 60px 50px 55px;
+  padding: 44px 52px;
+  max-width: 560px; width: 100%;
+  box-shadow:
+    0 8px 40px rgba(40,116,166,0.18),
+    0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+  position: relative;
+}
+
+/* ── Typography ──────────────────────────────────────────────────────── */
+.title-main {
+  font-family: 'Boogaloo', cursive;
+  font-size: 3rem;
+  color: var(--title-color);
+  line-height: 1.1;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.title-sub {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  color: var(--text-mid);
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.desc-text {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.story-text {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-dark);
+  background: var(--card-tint);
+  border-left: 4px solid var(--wave1);
+  border-radius: 0 10px 10px 0;
+  padding: 16px 20px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.greeting {
+  font-family: 'Boogaloo', cursive;
+  font-size: 1.4rem;
+  color: var(--text-mid);
+  margin-bottom: 20px;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────── */
+.divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--wave1), transparent);
+  margin: 24px 0;
+  border-radius: 2px;
+}
+
+/* ── Form inputs ─────────────────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--card-tint);
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  color: var(--text-dark);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--wave1);
+  box-shadow: 0 0 0 3px rgba(74,144,217,0.2);
+}
+
+.form-group input::placeholder { color: rgba(0,0,0,0.3); }
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border: none; border-radius: 30px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  text-decoration: none;
+  line-height: 1.3;
+}
+.btn:active { transform: scale(0.96); }
+
+.btn-primary {                          /* dark teal — matches "set sail!" */
+  background: var(--btn-bg);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(46,107,138,0.35);
+}
+.btn-primary:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46,107,138,0.45);
+}
+
+/* keep gold alias for any remaining references */
+.btn-gold {
+  background: var(--btn-bg);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(46,107,138,0.35);
+}
+.btn-gold:hover { background: var(--btn-hover); transform: translateY(-2px); }
+
+.btn-ocean {
+  background: var(--wave1);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(74,144,217,0.35);
+}
+.btn-ocean:hover { background: var(--wave2); transform: translateY(-2px); }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(192,57,43,0.3);
+}
+.btn-danger:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+.btn-ghost {
+  background: transparent;
+  border: 2px solid var(--wave1);
+  color: var(--wave2);
+}
+.btn-ghost:hover { background: rgba(74,144,217,0.1); }
+
+.btn-row {
+  margin-top: 22px;
+  display: flex; gap: 12px;
+  justify-content: center; flex-wrap: wrap;
+}
+
+/* ── Hearts / lives ──────────────────────────────────────────────────── */
+.hearts {
+  display: flex; gap: 6px; font-size: 1.5rem;
+  justify-content: center; margin: 8px 0;
+}
+
+/* ── HUD bar (in-game) ───────────────────────────────────────────────── */
+.hud {
+  width: 100%; max-width: 680px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card-bg);
+  border: 2px solid var(--wave1);
+  border-radius: 16px;
+  padding: 10px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 16px rgba(74,144,217,0.2);
+}
+.hud-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.hud-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.72rem;
+  color: var(--wave2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.hud-value {
+  font-family: 'Boogaloo', cursive;
+  font-size: 1.05rem;
+  color: var(--title-color);
+}
+
+/* ── Level badge ─────────────────────────────────────────────────────── */
+.level-badge {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, var(--wave1), var(--wave2));
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+/* ── Canvas wrapper ──────────────────────────────────────────────────── */
+.canvas-wrap {
+  border: 3px solid var(--wave1);
+  border-radius: 14px;
+  overflow: auto;
+  box-shadow: 0 6px 24px rgba(40,116,166,0.25);
+  max-width: 90vw;
+  max-height: 68vh;
+  background: var(--sky);
+}
+#gameCanvas { display: block; image-rendering: pixelated; }
+
+/* ── Game overlays ───────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(135,206,235,0.82);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s;
+}
+.overlay.active { opacity: 1; pointer-events: all; }
+
+.overlay-box {
+  background: var(--card-bg);
+  border: 2px solid var(--wave1);
+  border-radius: 24px;
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 400px; width: 90%;
+  box-shadow: 0 8px 32px rgba(40,116,166,0.25);
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.overlay-title {
+  font-family: 'Boogaloo', cursive;
+  font-size: 1.9rem;
+  color: var(--wave2);
+  margin-bottom: 12px;
+}
+.overlay-msg {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1rem;
+  color: var(--text-dark);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* ── Stats table ─────────────────────────────────────────────────────── */
+.stats-table {
+  width: 100%; border-collapse: collapse;
+  margin-top: 14px; font-size: 0.88rem;
+}
+.stats-table th, .stats-table td {
+  padding: 8px 12px; text-align: center;
+  border-bottom: 1px solid rgba(74,144,217,0.2);
+}
+.stats-table th {
+  font-family: 'Fredoka One', cursive;
+  color: var(--wave2); font-size: 0.8rem;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.stats-table td { color: var(--text-dark); }
+.stats-table tr:last-child td { border-bottom: none; }
+
+/* ── Notification toast ──────────────────────────────────────────────── */
+.notif {
+  position: fixed; top: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-bg);
+  border: 2px solid var(--wave1);
+  border-radius: 12px;
+  padding: 10px 26px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--wave2);
+  z-index: 200;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(40,116,166,0.2);
+}
+.notif.show { opacity: 1; }
+
+/* ── Choice buttons (story page) ─────────────────────────────────────── */
+.choice-btn {
+  display: block; width: 100%;
+  margin-bottom: 12px; padding: 14px 20px;
+  font-size: 1.05rem;
+}
+
+/* ── Float animation ─────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* ── Win / final page ────────────────────────────────────────────────── */
+.crown { font-size: 4.5rem; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+
+/* ── History player cards ────────────────────────────────────────────── */
+.player-card {
+  background: var(--card-tint);
+  border: 1.5px solid var(--input-border);
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.player-name {
+  font-family: 'Boogaloo', cursive;
+  font-size: 1.15rem;
+  color: var(--wave2);
+}
+.player-meta { font-size: 0.82rem; color: rgba(0,0,0,0.5); }
+
+/* ── Popup (journey confirm + video) ─────────────────────────────────── */
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(135,206,235,0.88);
+  display: none; align-items: center; justify-content: center;
+}
+.popup-overlay.active { display: flex; }
+.popup-box {
+  background: var(--card-bg);
+  border: 2px solid var(--wave1);
+  border-radius: 28px;
+  padding: 44px 52px;
+  text-align: center;
+  max-width: 420px; width: 90%;
+  box-shadow: 0 8px 40px rgba(40,116,166,0.3);
+  animation: popIn 0.35s ease;
+}
+.popup-title {
+  font-family: 'Boogaloo', cursive;
+  font-size: 1.9rem;
+  color: var(--title-color);
+  margin-bottom: 10px;
+}
+.popup-sub {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.05rem;
+  color: var(--text-mid);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+/* ── Video overlay ───────────────────────────────────────────────────── */
+.video-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: #000;
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.video-overlay.active { display: flex; }
+.video-overlay video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.skip-btn {
+  position: absolute; bottom: 30px; right: 30px;
+  background: rgba(255,255,255,0.18);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
+  color: #fff;
+  padding: 8px 22px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s;
+}
+.skip-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .card { padding: 28px 20px; }
+  .title-main { font-size: 2.2rem; }
+  .overlay-box { padding: 28px 20px; }
+  .popup-box { padding: 28px 20px; }
+}

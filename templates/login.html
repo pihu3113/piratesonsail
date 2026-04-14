@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pirate on Sail — The Pirate's Maze</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* ── Page background exactly matching Figma ── */
+    body { background: #87CEEB; }
+
+    /* ── Blob card — matches Figma center white shape ── */
+    .login-blob {
+      position: relative; z-index: 10;
+      background: rgba(255,255,255,0.88);
+      border-radius: 55px 45px 65px 50px / 50px 65px 45px 60px;
+      padding: 44px 56px 48px;
+      max-width: 580px; width: 92%;
+      box-shadow: 0 6px 40px rgba(40,116,166,0.15);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-title {
+      font-family: 'Boogaloo', cursive;
+      font-size: 3.4rem;
+      color: #111;
+      line-height: 1.05;
+      margin-bottom: 4px;
+    }
+    .login-subtitle {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.2rem;
+      color: #2874A6;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+    }
+    .login-desc {
+      font-family: 'Indie Flower', cursive;
+      font-size: 1.08rem;
+      color: #111;
+      line-height: 1.65;
+      margin-bottom: 30px;
+    }
+
+    /* Input groups */
+    .f-group { text-align: left; margin-bottom: 18px; }
+    .f-group label {
+      display: block;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .f-group input {
+      width: 100%; padding: 11px 16px;
+      background: #EAF6FD;
+      border: 2px solid #90CAE8;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.97rem;
+      color: #111;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .f-group input:focus {
+      border-color: #4A90D9;
+      box-shadow: 0 0 0 3px rgba(74,144,217,0.2);
+    }
+
+    /* Set Sail button — matches Figma right-aligned dark teal pill */
+    .sail-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .btn-sail {
+      background: #2E6B8A;
+      color: #fff;
+      border: none; border-radius: 30px;
+      padding: 12px 32px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(46,107,138,0.4);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-sail:hover { background: #1a5270; transform: translateY(-2px); }
+    .btn-sail:active { transform: scale(0.96); }
+
+    /* History link */
+    .history-link {
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      color: #2874A6;
+      text-decoration: none;
+      border: 2px solid #4A90D9;
+      border-radius: 20px;
+      padding: 6px 18px;
+      transition: background 0.2s;
+    }
+    .history-link:hover { background: rgba(74,144,217,0.12); }
+
+    /* ── Animated waves at bottom (matches Figma) ── */
+    .waves-wrap {
+      position: fixed;
+      bottom: 0; left: 0; width: 100%;
+      z-index: 5; pointer-events: none;
+      overflow: hidden; height: 180px;
+    }
+    .wave-svg {
+      position: absolute; bottom: 0; left: -5%;
+      width: 110%; height: 180px;
+      animation: waveSlide 8s ease-in-out infinite alternate;
+    }
+    .wave-svg.back { animation-duration: 11s; animation-direction: alternate-reverse; }
+    @keyframes waveSlide {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(4%); }
+    }
+
+    /* ── Journey popup ── */
+    .journey-popup {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(135,206,235,0.86);
+      display: none; align-items: center; justify-content: center;
+    }
+    .journey-popup.active { display: flex; }
+    .journey-box {
+      background: #fff;
+      border: 2px solid #4A90D9;
+      border-radius: 30px;
+      padding: 48px 56px;
+      text-align: center;
+      max-width: 420px; width: 90%;
+      box-shadow: 0 10px 40px rgba(40,116,166,0.25);
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.82); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .journey-icon { font-size: 3.2rem; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-10px); }
+    }
+    .journey-title {
+      font-family: 'Boogaloo', cursive;
+      font-size: 2rem; color: #111;
+      margin-bottom: 10px;
+    }
+    .journey-sub {
+      font-family: 'Indie Flower', cursive;
+      font-size: 1.05rem; color: #2874A6;
+      line-height: 1.6; margin-bottom: 30px;
+    }
+    .journey-btns { display: flex; gap: 14px; justify-content: center; }
+    .btn-yes {
+      background: #2E6B8A; color: #fff;
+      border: none; border-radius: 24px;
+      padding: 12px 36px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(46,107,138,0.35);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-yes:hover { background: #1a5270; transform: translateY(-2px); }
+    .btn-no {
+      background: transparent; color: #2874A6;
+      border: 2px solid #4A90D9; border-radius: 24px;
+      padding: 12px 36px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-no:hover { background: rgba(74,144,217,0.1); }
+
+    /* ── Video overlay ── */
+    .video-overlay {
+      position: fixed; inset: 0; z-index: 600;
+      background: #000;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .video-overlay.active { display: flex; }
+    .video-overlay video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .btn-skip {
+      position: absolute; bottom: 28px; right: 28px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 20px; color: #fff;
+      padding: 8px 22px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.95rem; cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+    .btn-skip:hover { background: rgba(255,255,255,0.28); }
+
+    /* Hidden actual form for final POST */
+    #actualForm { display: none; }
+
+    /* ── Post-video popup ── */
+    .scared-popup {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(135,206,235,0.90);
+      display: none; align-items: center; justify-content: center;
+    }
+    .scared-popup.active { display: flex; }
+    .scared-box {
+      background: #fff;
+      border: 2px solid #4A90D9;
+      border-radius: 30px;
+      padding: 48px 52px;
+      text-align: center;
+      max-width: 440px; width: 90%;
+      box-shadow: 0 10px 40px rgba(40,116,166,0.28);
+      animation: popIn 0.35s ease;
+    }
+    .scared-icon { font-size: 3.4rem; margin-bottom: 10px; animation: float 2.5s ease-in-out infinite; }
+    .scared-title {
+      font-family: 'Boogaloo', cursive;
+      font-size: 2rem; color: #111;
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .scared-sub {
+      font-family: 'Indie Flower', cursive;
+      font-size: 1.05rem; color: #2874A6;
+      line-height: 1.6; margin-bottom: 28px;
+    }
+    .scared-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .scared-response {
+      font-family: 'Indie Flower', cursive;
+      font-size: 1rem; color: #16a34a;
+      margin-top: 16px; display: none;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated sky background bubbles -->
+  <div class="stars"></div>
+
+  <!-- Main layout -->
+  <div style="position:relative; z-index:10; min-height:100vh;
+              display:flex; flex-direction:column;
+              align-items:center; justify-content:center;
+              padding: 24px 16px 160px;">
+
+    <!-- ── WHITE BLOB CARD (Figma design) ── -->
+    <div class="login-blob">
+
+      <div style="font-size:2.6rem; margin-bottom:6px; animation:float 3s ease-in-out infinite;">
+        🏴‍☠️
+      </div>
+
+      <h1 class="login-title">Pirate on Sail</h1>
+      <p class="login-subtitle">The Pirate's Maze</p>
+
+      <p class="login-desc">
+        Set sail on an AI-powered ocean adventure.<br>
+        Find the treasure before the octopus finds you!
+      </p>
+
+      <!-- Visible form (capture values, do NOT submit directly) -->
+      <form id="visibleForm" onsubmit="handleLogin(event)">
+        <div class="f-group">
+          <label for="name">Enter your name, Captain</label>
+          <input type="text" id="name" placeholder="Captain Blackbeard…"
+                 maxlength="30" required autocomplete="off">
+        </div>
+        <div class="f-group">
+          <label for="birthday">Enter your Birthday</label>
+          <input type="date" id="birthday" required>
+        </div>
+        <div class="sail-row">
+          <button type="submit" class="btn-sail">set sail !</button>
+        </div>
+      </form>
+
+      <div style="margin-top:22px;">
+        <a href="/history" class="history-link">📜 Pirate History</a>
+      </div>
+
+    </div><!-- /blob -->
+
+  </div>
+
+  <!-- Hidden form that actually POSTs to Flask -->
+  <form id="actualForm" action="/story" method="POST">
+    <input type="hidden" id="hiddenName"     name="name">
+    <input type="hidden" id="hiddenBirthday" name="birthday">
+  </form>
+
+  <!-- ── "Are you ready?" popup ── -->
+  <div class="journey-popup" id="journeyPopup">
+    <div class="journey-box">
+      <div class="journey-icon">⚓</div>
+      <h2 class="journey-title">Are you ready<br>for the journey??</h2>
+      <p class="journey-sub">
+        The ocean awaits, Captain.<br>
+        Danger, treasure, and glory lie ahead!
+      </p>
+      <div class="journey-btns">
+        <button class="btn-yes" onclick="startJourney()">⛵ Yes!</button>
+        <button class="btn-no"  onclick="closePopup()">Not yet…</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Post-video "Scared?" popup ── -->
+  <div class="scared-popup" id="scaredPopup">
+    <div class="scared-box">
+      <div class="scared-icon">🏴‍☠️</div>
+      <h2 class="scared-title">Are you ready??<br>Or are you scared??</h2>
+      <p class="scared-sub">
+        The ocean is vast and the maze is treacherous…<br>
+        Only the bravest captains find the treasure!
+      </p>
+      <div class="scared-btns">
+        <button class="btn-yes" onclick="goReady()">⚔️ I am Ready!</button>
+        <button class="btn-no"  onclick="goScared()">😨 I am Scared!</button>
+      </div>
+      <p class="scared-response" id="scaredResponse">
+        🦜 Ha! Even the bravest pirates were scared once…<br>
+        The sea forgives no coward — but it rewards the bold!<br>
+        <em>Setting sail anyway in 3 seconds… ⛵</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Intro video overlay ── -->
+  <div class="video-overlay" id="videoOverlay">
+    <video id="introVideo" playsinline>
+      <source src="{{ url_for('static', filename='opening_animation.mp4') }}" type="video/mp4">
+    </video>
+    <button class="btn-skip" onclick="skipVideo()">Skip ▶</button>
+  </div>
+
+  <!-- ── Animated waves (bottom, matches Figma) ── -->
+  <div class="waves-wrap">
+    <!-- Back wave (darker) -->
+    <svg class="wave-svg back" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 180" preserveAspectRatio="none">
+      <path fill="#2874A6"
+        d="M0,100 C180,140 360,60 540,100 C720,140 900,60 1080,100 C1260,140 1380,80 1440,100 L1440,180 L0,180 Z"/>
+    </svg>
+    <!-- Front wave (lighter) -->
+    <svg class="wave-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 180" preserveAspectRatio="none">
+      <path fill="#4A90D9"
+        d="M0,120 C200,80 400,150 600,120 C800,90 1000,155 1200,120 C1320,100 1400,130 1440,120 L1440,180 L0,180 Z"/>
+    </svg>
+  </div>
+
+  <script>
+    let _capturedName     = '';
+    let _capturedBirthday = '';
+
+    function handleLogin(e) {
+      e.preventDefault();
+      _capturedName     = document.getElementById('name').value.trim();
+      _capturedBirthday = document.getElementById('birthday').value;
+      if (!_capturedName || !_capturedBirthday) return;
+
+      // Speak intro line
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('Are you ready for the journey, Captain?');
+        u.rate = 0.85; u.pitch = 0.8;
+        speechSynthesis.speak(u);
+      }
+
+      // Show "ready?" popup
+      document.getElementById('journeyPopup').classList.add('active');
+    }
+
+    function closePopup() {
+      document.getElementById('journeyPopup').classList.remove('active');
+    }
+
+    function startJourney() {
+      // Hide popup, show video
+      document.getElementById('journeyPopup').classList.remove('active');
+      const overlay = document.getElementById('videoOverlay');
+      overlay.classList.add('active');
+      const vid = document.getElementById('introVideo');
+      vid.play().catch(() => showScaredPopup()); // if autoplay blocked, show post-video popup
+
+      vid.addEventListener('ended', showScaredPopup, { once: true });
+    }
+
+    function skipVideo() {
+      document.getElementById('introVideo').pause();
+      showScaredPopup();
+    }
+
+    function showScaredPopup() {
+      document.getElementById('videoOverlay').classList.remove('active');
+      document.getElementById('scaredResponse').style.display = 'none';
+      document.getElementById('scaredPopup').classList.add('active');
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('Are you ready, Captain? Or are you scared?');
+        u.rate = 0.82; u.pitch = 0.75;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+    }
+
+    function goReady() {
+      document.getElementById('scaredPopup').classList.remove('active');
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('Brave heart! Let us find that treasure!');
+        u.rate = 0.88; u.pitch = 0.8;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+      submitForm();
+    }
+
+    function goScared() {
+      const resp = document.getElementById('scaredResponse');
+      resp.style.display = 'block';
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('Ha! Even the bravest pirates were scared once. Setting sail anyway!');
+        u.rate = 0.85; u.pitch = 0.78;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+      setTimeout(submitForm, 3200);
+    }
+
+    function submitForm() {
+      document.getElementById('hiddenName').value     = _capturedName;
+      document.getElementById('hiddenBirthday').value = _capturedBirthday;
+      document.getElementById('actualForm').submit();
+    }
+  </script>
+
+</body>
+</html>

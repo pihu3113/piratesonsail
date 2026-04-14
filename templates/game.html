@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level {{ level }} — Pirate on Sail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body { background: #87CEEB; overflow: hidden; }
+
+    .game-layout {
+      position: relative; z-index: 10;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      padding: 10px 10px 8px; gap: 8px;
+    }
+
+    /* D-pad mobile */
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      grid-template-rows: repeat(3, 52px);
+      gap: 4px; margin-top: 8px;
+    }
+    .dpad-btn {
+      background: rgba(46,107,138,0.75);
+      border: 1.5px solid #4A90D9;
+      border-radius: 10px;
+      color: #fff; font-size: 1.3rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none; transition: background 0.1s;
+    }
+    .dpad-btn:active { background: rgba(74,144,217,0.95); }
+    .dpad-btn.center { opacity: 0; pointer-events: none; }
+    @media (min-width: 640px) { .dpad { display: none; } }
+
+    /* Loading screen */
+    #loading {
+      position: fixed; inset: 0; z-index: 500;
+      background: #87CEEB;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+      transition: opacity 0.5s;
+    }
+    #loading.hide { opacity: 0; pointer-events: none; }
+    .loading-icon { font-size: 3.5rem; animation: float 1.5s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .loading-title { font-family:'Boogaloo',cursive; font-size:1.8rem; color:#1a1a1a; }
+    .loading-bar   { width:200px; height:8px; background:rgba(255,255,255,0.5); border-radius:4px; overflow:hidden; }
+    .loading-fill  { height:100%; background:linear-gradient(90deg,#4A90D9,#2874A6); border-radius:4px;
+                     animation:loadProg 1.8s ease forwards; }
+    @keyframes loadProg { from{width:0} to{width:100%} }
+    .loading-sub { font-family:'Indie Flower',cursive; font-size:1rem; color:#2874A6; }
+
+    /* Waves behind canvas */
+    .bg-waves {
+      position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1;
+      pointer-events: none; overflow: hidden; height: 120px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <!-- Loading screen -->
+  <div id="loading">
+    <div class="loading-icon">🚢</div>
+    <p class="loading-title">Setting Sail…</p>
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <p class="loading-sub">AI is charting the waters…</p>
+  </div>
+
+  <!-- Game Over overlay -->
+  <div class="overlay" id="overlay-gameover">
+    <div class="overlay-box">
+      <div style="font-size:3rem; margin-bottom:10px;">💀</div>
+      <h2 class="overlay-title" style="color:var(--danger);">Ship Wrecked!</h2>
+      <p class="overlay-msg">The rocks have claimed your vessel,<br>Captain {{ name }}.<br>A true pirate never gives up!</p>
+      <div class="btn-row">
+        <button id="btn-restart" class="btn btn-primary">⚓ Try Again</button>
+        <button id="btn-menu"    class="btn btn-ghost">🏠 Port</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="notif" id="notif"></div>
+
+  <!-- Game layout -->
+  <div class="game-layout">
+
+    <!-- HUD -->
+    <div class="hud"
+         id="hud"
+         data-level="{{ level }}"
+         data-name="{{ name }}"
+         data-lives="{{ lives }}">
+
+      <div class="hud-item">
+        <span class="hud-label">Captain</span>
+        <span class="hud-value" style="font-size:0.82rem; font-family:'Boogaloo',cursive;">{{ name }}</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Level</span>
+        <span class="level-badge">{{ level }} / 3</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Lives</span>
+        <span id="hearts" class="hud-value" style="font-size:1.2rem;"></span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Time</span>
+        <span id="timer" class="hud-value">00:00</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Moves</span>
+        <span id="moves-count" class="hud-value">0</span>
+      </div>
+      <div class="hud-item">
+        <button id="btn-mute" title="Toggle sound"
+          style="background:none; border:1.5px solid #4A90D9; border-radius:8px;
+                 color:#2874A6; padding:4px 10px; cursor:pointer; font-size:1rem;">
+          🔊
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <!-- Mobile D-pad -->
+    <div class="dpad">
+      <div></div>
+      <button class="dpad-btn" id="btn-up">▲</button>
+      <div></div>
+      <button class="dpad-btn" id="btn-left">◀</button>
+      <div class="dpad-btn center"></div>
+      <button class="dpad-btn" id="btn-right">▶</button>
+      <div></div>
+      <button class="dpad-btn" id="btn-down">▼</button>
+      <div></div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex; gap:16px; font-size:0.8rem; color:rgba(0,0,0,0.5);
+                flex-wrap:wrap; justify-content:center; align-items:center;">
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="display:inline-block;width:16px;height:16px;background:#dc2626;border-radius:3px;"></span> You (P)
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="display:inline-block;width:16px;height:16px;background:#16a34a;border-radius:3px;"></span> Goal (G)
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="display:inline-block;width:16px;height:16px;background:#6b7280;border-radius:2px;border:1px solid #374151;"></span> Rock Wall
+      </span>
+      {% if level == 3 %}
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="display:inline-block;width:16px;height:16px;background:#7c3aed;border-radius:3px;"></span> Guardian
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div class="bg-waves">
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:120px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path fill="#4A90D9" opacity="0.6"
+        d="M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 C1320,75 1400,55 1440,60 L1440,120 L0,120 Z"/>
+    </svg>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+  <script>
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('hide');
+    }, 2000);
+  </script>
+</body>
+</html>

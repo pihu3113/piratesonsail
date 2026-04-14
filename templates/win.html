@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victory! — Pirate on Sail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="ocean-bg"></div>
+  <div class="stars"></div>
+  <canvas id="fw" style="position:fixed;inset:0;pointer-events:none;z-index:5;"></canvas>
+
+  <div class="page-wrap">
+    <div class="card" style="max-width:600px;">
+
+      <div class="crown">👑</div>
+      <h1 class="title-main">Ocean Conquered!</h1>
+      <p class="title-sub">🏴‍☠️ Legend of the Seven Seas 🏴‍☠️</p>
+
+      <div class="divider"></div>
+
+      <div class="story-text" style="text-align:center;">
+        <em>
+          "You have conquered the ocean and found all the treasure!<br>
+          The giant octopus bows before your might,
+          Captain <strong>{{ name }}</strong>.<br><br>
+          Now you may rest… you have earned it."
+        </em>
+      </div>
+
+      <div style="font-size:2.2rem; margin:16px 0;">🏴‍☠️ 💰 🐙 ⚓</div>
+
+      <div class="divider"></div>
+
+      {% if stats %}
+      <p style="font-family:'Fredoka One',cursive; color:var(--wave2); font-size:0.95rem;
+                letter-spacing:1px; margin-bottom:12px;">⭐ Voyage Summary</p>
+      <table class="stats-table">
+        <thead>
+          <tr><th>Level</th><th>Time (s)</th><th>Crashes</th><th>Efficiency</th><th>Lives Left</th></tr>
+        </thead>
+        <tbody>
+          {% for s in stats %}
+          <tr>
+            <td>{{ s.level }}</td>
+            <td>{{ s.time }}</td>
+            <td>{{ s.mistakes }}</td>
+            <td>{% if s.efficiency %}{{ "%.0f"|format(s.efficiency*100) }}%{% else %}—{% endif %}</td>
+            <td>{{ s.lives_left }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      <div class="btn-row" style="margin-top:26px;">
+        <a href="/" class="btn btn-primary">⚓ Play Again</a>
+        <a href="/history" class="btn btn-ocean">📜 Pirate History</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div style="position:fixed;bottom:0;left:0;width:100%;z-index:5;pointer-events:none;overflow:hidden;height:160px;">
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:160px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 160" preserveAspectRatio="none">
+      <path fill="#4A90D9" d="M0,80 C200,110 400,50 600,80 C800,110 1000,50 1200,80 C1320,95 1400,70 1440,80 L1440,160 L0,160 Z"/>
+    </svg>
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:110px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 110" preserveAspectRatio="none">
+      <path fill="#2874A6" d="M0,60 C180,30 360,80 540,60 C720,40 900,80 1080,60 C1260,40 1380,70 1440,60 L1440,110 L0,110 Z"/>
+    </svg>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('Congratulations! You have conquered the ocean and found all the treasure! Now you may rest, Captain.');
+        u.rate=0.82; u.pitch=0.78; speechSynthesis.speak(u);
+      }
+      // Win fanfare
+      try {
+        const AC = new (window.AudioContext||window.webkitAudioContext)();
+        [523,659,784,880,1047,880,784,1047].forEach((f,i) => {
+          const o=AC.createOscillator(), g=AC.createGain();
+          o.connect(g); g.connect(AC.destination);
+          o.frequency.value=f; o.type='sine';
+          g.gain.setValueAtTime(0.28, AC.currentTime+i*0.18);
+          g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime+i*0.18+0.35);
+          o.start(AC.currentTime+i*0.18); o.stop(AC.currentTime+i*0.18+0.36);
+        });
+      } catch(e){}
+    });
+
+    // Fireworks
+    const fw=document.getElementById('fw');
+    fw.width=window.innerWidth; fw.height=window.innerHeight;
+    const fc=fw.getContext('2d');
+    const COLS=['#4A90D9','#2874A6','#87CEEB','#ffd700','#fff','#f44336'];
+    let parts=[];
+    function burst(x,y) {
+      for(let i=0;i<30;i++){
+        const a=(Math.PI*2*i)/30, sp=Math.random()*4+1;
+        parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+          size:Math.random()*5+2,color:COLS[Math.floor(Math.random()*COLS.length)],
+          life:1,decay:Math.random()*0.014+0.007});
+      }
+    }
+    (function tickFw() {
+      fc.clearRect(0,0,fw.width,fw.height);
+      parts=parts.filter(p=>p.life>0);
+      parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.07;p.life-=p.decay;
+        fc.globalAlpha=p.life;fc.fillStyle=p.color;
+        fc.beginPath();fc.arc(p.x,p.y,p.size,0,Math.PI*2);fc.fill();
+      });
+      fc.globalAlpha=1;
+      requestAnimationFrame(tickFw);
+    })();
+    burst(fw.width*0.3, fw.height*0.25);
+    burst(fw.width*0.7, fw.height*0.2);
+    setInterval(()=>burst(Math.random()*fw.width, Math.random()*fw.height*0.5), 900);
+  </script>
+</body>
+</html>

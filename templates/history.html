@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legendary Captains — Pirate on Sail</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .captain-card {
+      background: var(--card-tint);
+      border: 1.5px solid var(--input-border);
+      border-radius: 16px; padding: 18px 22px;
+      margin-bottom: 14px; display: flex;
+      align-items: flex-start; gap: 16px;
+      transition: box-shadow 0.2s;
+    }
+    .captain-card:hover { box-shadow: 0 4px 16px rgba(74,144,217,0.2); }
+    .captain-rank { font-family:'Boogaloo',cursive; font-size:1.6rem; color:var(--wave2); min-width:34px; text-align:center; margin-top:2px; }
+    .captain-name { font-family:'Boogaloo',cursive; font-size:1.3rem; color:var(--wave2); margin-bottom:4px; }
+    .captain-date { font-size:0.8rem; color:rgba(0,0,0,0.45); margin-bottom:8px; }
+    .stat-chip {
+      background: #fff; border: 1px solid var(--input-border);
+      border-radius: 20px; padding:3px 12px;
+      font-size:0.8rem; color:var(--text-dark);
+      font-family:'Nunito',sans-serif;
+    }
+    .badge-done {
+      background: var(--success); color:#fff; border-radius:20px;
+      padding:3px 12px; font-size:0.78rem;
+      font-family:'Fredoka One',cursive; letter-spacing:1px;
+    }
+    .empty-state { text-align:center; padding:48px 0; color:rgba(0,0,0,0.4); }
+    .empty-state .icon { font-size:3.5rem; margin-bottom:12px; }
+  </style>
+</head>
+<body>
+  <div class="ocean-bg"></div>
+  <div class="stars"></div>
+
+  <div class="page-wrap">
+    <div class="card" style="max-width:680px; width:100%;">
+
+      <div style="font-size:3rem; margin-bottom:10px; animation:float 3s ease-in-out infinite;">🏆</div>
+      <h1 class="title-main">Hall of Legendary Captains</h1>
+      <p class="title-sub">⚓ Those who conquered the Pirate's Maze ⚓</p>
+      <div class="divider"></div>
+
+      {% if players %}
+        {% set legends = players | selectattr("completed") | list | reverse | list %}
+        {% if legends %}
+          {% for p in legends %}
+          <div class="captain-card">
+            <div class="captain-rank">
+              {% if loop.index == 1 %}👑
+              {% elif loop.index == 2 %}🥈
+              {% elif loop.index == 3 %}🥉
+              {% else %}{{ loop.index }}{% endif %}
+            </div>
+            <div style="flex:1;">
+              <div class="captain-name">🏴‍☠️ Captain {{ p.name }}</div>
+              <div class="captain-date">
+                Conquered on {{ p.date }}
+                {% if p.birthday %} · Born: {{ p.birthday }}{% endif %}
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+                {% if p.stats %}
+                  {% set total_time = p.stats|sum(attribute='time') %}
+                  {% set total_mistakes = p.stats|sum(attribute='mistakes') %}
+                  {% set avg_eff = (p.stats|sum(attribute='efficiency'))/(p.stats|length) %}
+                  <span class="stat-chip">⏱️ {{ total_time|round(0)|int }}s</span>
+                  <span class="stat-chip">💥 {{ total_mistakes }} crashes</span>
+                  <span class="stat-chip">⭐ {{ "%.0f"|format(avg_eff*100) }}% avg</span>
+                {% endif %}
+                <span class="badge-done">✅ All 3 Levels</span>
+              </div>
+              {% if p.stats %}
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                {% for s in p.stats %}
+                <div style="background:#fff; border:1px solid var(--input-border); border-radius:8px;
+                            padding:5px 10px; font-size:0.78rem; color:rgba(0,0,0,0.55); font-family:'Nunito',sans-serif;">
+                  <strong style="color:var(--wave2);">Level {{ s.level }}</strong><br>
+                  {{ s.time }}s · {{ s.mistakes }} hits
+                  {% if s.efficiency %} · {{ "%.0f"|format(s.efficiency*100) }}%{% endif %}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="icon">🌊</div>
+            <p style="font-family:'Indie Flower',cursive; font-size:1.05rem;">
+              No captain has completed the full game yet.<br>Be the first legend!
+            </p>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <div class="icon">🌊</div>
+          <p style="font-family:'Indie Flower',cursive; font-size:1.05rem;">
+            No legendary captains yet.<br>Set sail and make history!
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="divider"></div>
+      <div class="btn-row">
+        <a href="/" class="btn btn-primary">⚓ Set Sail!</a>
+        <a href="javascript:history.back()" class="btn btn-ghost">← Back</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Waves -->
+  <div style="position:fixed;bottom:0;left:0;width:100%;z-index:5;pointer-events:none;overflow:hidden;height:150px;">
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:150px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 150" preserveAspectRatio="none">
+      <path fill="#4A90D9" d="M0,80 C200,110 400,50 600,80 C800,110 1000,50 1200,80 C1320,95 1400,70 1440,80 L1440,150 L0,150 Z"/>
+    </svg>
+    <svg style="position:absolute;bottom:0;left:-5%;width:110%;height:100px;"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+      <path fill="#2874A6" d="M0,55 C180,30 360,75 540,55 C720,35 900,75 1080,55 C1260,35 1380,65 1440,55 L1440,100 L0,100 Z"/>
+    </svg>
+  </div>
+</body>
+</html>
